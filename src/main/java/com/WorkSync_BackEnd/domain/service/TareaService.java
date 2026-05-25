@@ -1,5 +1,8 @@
 package com.WorkSync_BackEnd.domain.service;
 
+import com.WorkSync_BackEnd.domain.dto.TareaRequestDTO;
+import com.WorkSync_BackEnd.domain.dto.TareaResponseDTO;
+import com.WorkSync_BackEnd.persistence.mapper.TareaMapper;
 import com.WorkSync_BackEnd.persistence.crud.TareaCrudRepository;
 import com.WorkSync_BackEnd.persistence.crud.ProyectoCrudRepository;
 import com.WorkSync_BackEnd.persistence.entity.Tarea;
@@ -14,45 +17,54 @@ import java.util.List;
 public class TareaService {
     private final TareaCrudRepository tareaCrudRepository;
     private final ProyectoCrudRepository proyectoCrudRepository;
+    private final TareaMapper tareaMapper;
 
-    public List<Tarea> listar() {
-        return tareaCrudRepository.findAll();
+    public List<TareaResponseDTO> listar() {
+        return tareaMapper.toResponseDTOs(tareaCrudRepository.findAll());
     }
 
-    public Tarea guardar(Tarea tarea) {
-        if (tarea.getProyecto() == null || tarea.getProyecto().getIdProyecto() == null) {
+    public TareaResponseDTO guardar(TareaRequestDTO requestDTO) {
+        if (requestDTO.idProyecto() == null) {
             throw new RuntimeException("La tarea debe estar asociada a un proyecto.");
         }
-        Proyecto proyecto = proyectoCrudRepository.findById(tarea.getProyecto().getIdProyecto())
+        Proyecto proyecto = proyectoCrudRepository.findById(requestDTO.idProyecto())
                 .orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
         
+        Tarea tarea = tareaMapper.toTarea(requestDTO);
         tarea.setProyecto(proyecto);
         
         if (tarea.getEstado() == null) {
             tarea.setEstado(EstadoTarea.PENDIENTE);
         }
-        return tareaCrudRepository.save(tarea);
+        return tareaMapper.toResponseDTO(tareaCrudRepository.save(tarea));
     }
 
-    public List<Tarea> listarPorProyecto(Long idProyecto) {
-        return tareaCrudRepository.findByProyecto_IdProyecto(idProyecto);
+    public List<TareaResponseDTO> listarPorProyecto(Long idProyecto) {
+        return tareaMapper.toResponseDTOs(tareaCrudRepository.findByProyecto_IdProyecto(idProyecto));
     }
 
-    public Tarea editar(Long id, Tarea tareaDetalles) {
-        return tareaCrudRepository.findById(id).map(tarea -> {
-            tarea.setTitulo(tareaDetalles.getTitulo());
-            tarea.setDescripcion(tareaDetalles.getDescripcion());
-            if (tareaDetalles.getPrioridad() != null) {
-                tarea.setPrioridad(tareaDetalles.getPrioridad());
+    public TareaResponseDTO editar(Long id, TareaRequestDTO requestDTO) {
+        Tarea tareaActualizada = tareaCrudRepository.findById(id).map(tarea -> {
+            tarea.setTitulo(requestDTO.titulo());
+            tarea.setDescripcion(requestDTO.descripcion());
+            if (requestDTO.prioridad() != null) {
+                tarea.setPrioridad(requestDTO.prioridad());
+            }
+            if (requestDTO.idProyecto() != null) {
+                Proyecto proyecto = proyectoCrudRepository.findById(requestDTO.idProyecto())
+                        .orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
+                tarea.setProyecto(proyecto);
             }
             return tareaCrudRepository.save(tarea);
         }).orElseThrow(() -> new RuntimeException("Tarea no encontrada con id: " + id));
+        return tareaMapper.toResponseDTO(tareaActualizada);
     }
 
-    public Tarea actualizarEstado(Long id, EstadoTarea nuevoEstado) {
-        return tareaCrudRepository.findById(id).map(tarea -> {
+    public TareaResponseDTO actualizarEstado(Long id, EstadoTarea nuevoEstado) {
+        Tarea tareaActualizada = tareaCrudRepository.findById(id).map(tarea -> {
             tarea.setEstado(nuevoEstado);
             return tareaCrudRepository.save(tarea);
         }).orElseThrow(() -> new RuntimeException("Tarea no encontrada con id: " + id));
+        return tareaMapper.toResponseDTO(tareaActualizada);
     }
 }

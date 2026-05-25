@@ -1,5 +1,7 @@
 package com.WorkSync_BackEnd.controller;
 
+import com.WorkSync_BackEnd.domain.dto.TareaRequestDTO;
+import com.WorkSync_BackEnd.domain.dto.TareaResponseDTO;
 import com.WorkSync_BackEnd.domain.service.TareaService;
 import com.WorkSync_BackEnd.persistence.entity.Tarea;
 import com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea;
@@ -17,30 +19,30 @@ public class TareaController {
     private final TareaService tareaService;
 
     @GetMapping
-    public List<Tarea> listar() {
+    public List<TareaResponseDTO> listar() {
         return tareaService.listar();
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public Tarea guardar(@RequestBody Tarea tarea) {
-        return tareaService.guardar(tarea);
+    public TareaResponseDTO guardar(@RequestBody TareaRequestDTO requestDTO) {
+        return tareaService.guardar(requestDTO);
     }
 
     @GetMapping("/proyecto/{idProyecto}")
-    public List<Tarea> listarPorProyecto(@PathVariable Long idProyecto) {
+    public List<TareaResponseDTO> listarPorProyecto(@PathVariable Long idProyecto) {
         return tareaService.listarPorProyecto(idProyecto);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public Tarea editar(@PathVariable Long id, @RequestBody Tarea tarea) {
-        return tareaService.editar(id, tarea);
+    public TareaResponseDTO editar(@PathVariable Long id, @RequestBody TareaRequestDTO requestDTO) {
+        return tareaService.editar(id, requestDTO);
     }
 
     @PatchMapping("/{id}/estado")
     @PreAuthorize("hasAnyRole('ADMIN', 'COLABORADOR')")
-    public Tarea actualizarEstado(@PathVariable Long id, @RequestBody Map<String, String> body) {
+    public TareaResponseDTO actualizarEstado(@PathVariable Long id, @RequestBody Map<String, String> body) {
         EstadoTarea nuevoEstado = EstadoTarea.valueOf(body.get("estado"));
         return tareaService.actualizarEstado(id, nuevoEstado);
     }
