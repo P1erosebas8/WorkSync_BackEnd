@@ -1,7 +1,9 @@
-# Paso 1: Compilar la aplicación usando Maven y Java 21 (o cambia a 17 si usas esa versión)
+# Paso 1: Compilar la aplicación usando Maven y Java 21
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY . .
+# ¡Esta línea soluciona el error de permisos!
+RUN chmod +x mvnw
 RUN ./mvnw clean package -DskipTests
 
 # Paso 2: Ejecutar el archivo compilado .jar en un entorno ligero
