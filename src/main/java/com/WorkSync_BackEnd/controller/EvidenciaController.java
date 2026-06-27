@@ -40,14 +40,4 @@ public class EvidenciaController {
         return ResponseEntity.ok(evidenciaService.getEvidenciasByTarea(idTarea));
     }
 
-    @GetMapping("/descargar/{idEvidencia}")
-    public ResponseEntity<Resource> descargarEvidencia(@PathVariable Long idEvidencia) {
-        Resource resource = evidenciaService.loadEvidenciaAsResource(idEvidencia);
-        Evidencia evidencia = evidenciaService.getEvidenciaEntity(idEvidencia);
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(evidencia.getTipoMime()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + evidencia.getNombreArchivo() + "\"")
-                .body(resource);
-    }
 }
