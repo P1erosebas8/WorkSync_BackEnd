@@ -22,6 +22,9 @@ public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
 
+    @org.springframework.beans.factory.annotation.Value("${cors.allowed.origins:http://localhost:5173,https://work-sync-front-end.vercel.app}")
+    private java.util.List<String> allowedOrigins;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -47,11 +50,8 @@ public class SecurityConfig {
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
 
-        // Permitimos tu frontend de Vercel y también localhost por si acaso necesitas probar algo local luego
-        configuration.setAllowedOrigins(java.util.List.of(
-                "https://work-sync-front-end.vercel.app",
-                "http://localhost:5173"
-        ));
+        // Permitimos tu frontend de Vercel y localhost dinámicamente desde variables de entorno
+        configuration.setAllowedOrigins(allowedOrigins);
 
         configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type", "Cache-Control"));
