@@ -50,8 +50,8 @@ public class SecurityConfig {
     public org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource() {
         org.springframework.web.cors.CorsConfiguration configuration = new org.springframework.web.cors.CorsConfiguration();
 
-        // Permitimos tu frontend de Vercel y localhost dinámicamente desde variables de entorno
-        configuration.setAllowedOrigins(allowedOrigins);
+        // Permitimos orígenes usando patrones para evitar bloqueos estrictos de CORS en dispositivos móviles
+        configuration.setAllowedOriginPatterns(allowedOrigins);
 
         configuration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(java.util.List.of("Authorization", "Content-Type", "Cache-Control"));
