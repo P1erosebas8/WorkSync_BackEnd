@@ -6,6 +6,7 @@ public record TareaRequestDTO(
         String titulo,
         String descripcion,
         Prioridad prioridad,
-        Long idProyecto
+        Long idProyecto,
+        Long idResponsable
 ) {
 }

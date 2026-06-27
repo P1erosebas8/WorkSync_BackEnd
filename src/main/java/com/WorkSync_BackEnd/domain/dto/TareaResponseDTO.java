@@ -9,6 +9,7 @@ public record TareaResponseDTO(
         String descripcion,
         Prioridad prioridad,
         EstadoTarea estado,
-        String nombreUsuario
+        String nombreUsuario,
+        Long idResponsable
 ) {
 }

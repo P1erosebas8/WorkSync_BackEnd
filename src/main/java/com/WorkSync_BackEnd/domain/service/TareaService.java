@@ -7,6 +7,7 @@ import com.WorkSync_BackEnd.persistence.crud.TareaCrudRepository;
 import com.WorkSync_BackEnd.persistence.crud.ProyectoCrudRepository;
 import com.WorkSync_BackEnd.persistence.entity.Tarea;
 import com.WorkSync_BackEnd.persistence.entity.Proyecto;
+import com.WorkSync_BackEnd.persistence.entity.Usuario;
 import com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -54,6 +55,11 @@ public class TareaService {
                 Proyecto proyecto = proyectoCrudRepository.findById(requestDTO.idProyecto())
                         .orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
                 tarea.setProyecto(proyecto);
+            }
+            if (requestDTO.idResponsable() != null) {
+                Usuario responsable = new Usuario();
+                responsable.setIdUsuario(requestDTO.idResponsable());
+                tarea.setResponsable(responsable);
             }
             return tareaCrudRepository.save(tarea);
         }).orElseThrow(() -> new RuntimeException("Tarea no encontrada con id: " + id));

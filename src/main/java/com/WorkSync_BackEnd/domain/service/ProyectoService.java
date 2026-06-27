@@ -28,11 +28,22 @@ public class ProyectoService {
         boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().contains("ADMIN"));
                 
+        List<Proyecto> proyectos;
         if (isAdmin) {
-            return proyectoCrudRepository.findAll();
+            proyectos = proyectoCrudRepository.findAll();
         } else {
-            return asignacionCrudRepository.findProyectosByUsuarioEmail(emailUsuario);
+            proyectos = asignacionCrudRepository.findProyectosByUsuarioEmail(emailUsuario);
         }
+        
+        LocalDate today = LocalDate.now();
+        proyectos.forEach(p -> {
+            if (p.getFechaLimite() != null && p.getFechaLimite().isBefore(today) && p.getEstado() != com.WorkSync_BackEnd.persistence.entity.enums.EstadoProyecto.ARCHIVADO) {
+                p.setEstado(com.WorkSync_BackEnd.persistence.entity.enums.EstadoProyecto.ARCHIVADO);
+                proyectoCrudRepository.save(p);
+            }
+        });
+        
+        return proyectos;
     }
 
     public Proyecto guardar(Proyecto proyecto) {
@@ -51,6 +62,7 @@ public class ProyectoService {
             proyecto.setDescripcion(proyectoDetalles.getDescripcion());
             proyecto.setFechaInicio(proyectoDetalles.getFechaInicio());
             proyecto.setFechaFin(proyectoDetalles.getFechaFin());
+            proyecto.setFechaLimite(proyectoDetalles.getFechaLimite());
             return proyectoCrudRepository.save(proyecto);
         }).orElseThrow(() -> new RuntimeException("Proyecto no encontrado con id: " + id));
     }

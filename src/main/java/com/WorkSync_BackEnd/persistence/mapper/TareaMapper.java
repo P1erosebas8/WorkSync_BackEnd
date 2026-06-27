@@ -2,20 +2,66 @@ package com.WorkSync_BackEnd.persistence.mapper;
 
 import com.WorkSync_BackEnd.domain.dto.TareaRequestDTO;
 import com.WorkSync_BackEnd.domain.dto.TareaResponseDTO;
+import com.WorkSync_BackEnd.persistence.entity.Proyecto;
 import com.WorkSync_BackEnd.persistence.entity.Tarea;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import com.WorkSync_BackEnd.persistence.entity.Usuario;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring")
-public interface TareaMapper {
+@Component
+public class TareaMapper {
 
-    @Mapping(target = "proyecto.idProyecto", source = "idProyecto")
-    Tarea toTarea(TareaRequestDTO requestDTO);
+    public Tarea toTarea(TareaRequestDTO requestDTO) {
+        if (requestDTO == null) {
+            return null;
+        }
 
-    @Mapping(target = "nombreUsuario", source = "responsable.nombre")
-    TareaResponseDTO toResponseDTO(Tarea tarea);
+        Tarea.TareaBuilder tarea = Tarea.builder();
 
-    List<TareaResponseDTO> toResponseDTOs(List<Tarea> tareas);
+        tarea.titulo(requestDTO.titulo());
+        tarea.descripcion(requestDTO.descripcion());
+        tarea.prioridad(requestDTO.prioridad());
+
+        if (requestDTO.idProyecto() != null) {
+            Proyecto proyecto = new Proyecto();
+            proyecto.setIdProyecto(requestDTO.idProyecto());
+            tarea.proyecto(proyecto);
+        }
+
+        if (requestDTO.idResponsable() != null) {
+            Usuario responsable = new Usuario();
+            responsable.setIdUsuario(requestDTO.idResponsable());
+            tarea.responsable(responsable);
+        }
+
+        return tarea.build();
+    }
+
+    public TareaResponseDTO toResponseDTO(Tarea tarea) {
+        if (tarea == null) {
+            return null;
+        }
+
+        return new TareaResponseDTO(
+                tarea.getIdTarea(),
+                tarea.getTitulo(),
+                tarea.getDescripcion(),
+                tarea.getPrioridad(),
+                tarea.getEstado(),
+                tarea.getResponsable() != null ? tarea.getResponsable().getNombre() : null,
+                tarea.getResponsable() != null ? tarea.getResponsable().getIdUsuario() : null
+        );
+    }
+
+    public List<TareaResponseDTO> toResponseDTOs(List<Tarea> tareas) {
+        if (tareas == null) {
+            return null;
+        }
+
+        return tareas.stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
 }

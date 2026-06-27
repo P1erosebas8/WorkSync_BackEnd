@@ -9,5 +9,4 @@ public class WorkSyncBackEndApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(WorkSyncBackEndApplication.class, args);
 	}
-
 }

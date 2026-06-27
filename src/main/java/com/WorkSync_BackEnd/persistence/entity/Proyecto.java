@@ -19,6 +19,7 @@ private String nombre;
 private String descripcion;
 private LocalDate fechaInicio;
 private LocalDate fechaFin;
+private LocalDate fechaLimite;
 @Enumerated(EnumType.STRING)
 private EstadoProyecto estado;
 @ManyToOne

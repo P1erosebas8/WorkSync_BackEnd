@@ -25,6 +25,12 @@ public class Usuario {
 
     private Boolean estado;
 
+    @Column(name = "otp_code")
+    private String otpCode;
+
+    @Column(name = "otp_expiration")
+    private java.time.LocalDateTime otpExpiration;
+
     @ManyToOne
     @JoinColumn(name = "id_rol")
     private Rol rol;

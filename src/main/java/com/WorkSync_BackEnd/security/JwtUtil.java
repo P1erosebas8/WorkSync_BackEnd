@@ -47,6 +47,14 @@ public class JwtUtil {
         return createToken(claims, userDetails.getUsername());
     }
 
+    public String generateToken(UserDetails userDetails, com.WorkSync_BackEnd.persistence.entity.Usuario usuario) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("roles", userDetails.getAuthorities());
+        claims.put("idUsuario", usuario.getIdUsuario());
+        claims.put("nombre", usuario.getNombre());
+        return createToken(claims, userDetails.getUsername());
+    }
+
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
                 .setClaims(claims)
