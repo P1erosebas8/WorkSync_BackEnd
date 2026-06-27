@@ -16,15 +16,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,8 +34,8 @@ public class EvidenciaService {
     private final UsuarioCrudRepository usuarioCrudRepository;
     private final EvidenciaMapper evidenciaMapper;
 
-    // Directorio donde se guardarán las evidencias (relativo al proyecto)
-    private final String uploadDir = "uploads/evidencias/";
+    // Inyectado automáticamente por @RequiredArgsConstructor gracias a CloudinaryConfig
+    private final Cloudinary cloudinary;
 
     public EvidenciaDTO uploadEvidencia(Long idTarea, Long idUsuario, MultipartFile file) throws IOException {
         Tarea tarea = tareaCrudRepository.findById(idTarea)
@@ -46,25 +44,21 @@ public class EvidenciaService {
         Usuario usuario = usuarioCrudRepository.findById(idUsuario)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + idUsuario));
 
-        // Crear directorio si no existe
-        Path uploadPath = Paths.get(uploadDir);
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
+        // Subir a Cloudinary (resource_type "auto" permite PDFs, Word, Zip, Imágenes, etc.)
+        Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+                "resource_type", "auto",
+                "folder", "worksync_evidencias"
+        ));
 
-        // Limpiar nombre y asegurar unicidad
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-        String uniqueFileName = UUID.randomUUID().toString() + "_" + fileName;
-
-        // Guardar archivo en disco
-        Path filePath = uploadPath.resolve(uniqueFileName);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+        String fileUrl = uploadResult.get("secure_url").toString();
+        String publicId = uploadResult.get("public_id").toString();
+        String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
 
         // Crear entidad
         Evidencia evidencia = Evidencia.builder()
-                .nombreArchivo(fileName)
+                .nombreArchivo(originalFilename)
                 .tipoMime(file.getContentType())
-                .rutaArchivo(filePath.toString())
+                .rutaArchivo(fileUrl) // Guardamos la URL pública
                 .fechaSubida(LocalDateTime.now())
                 .tarea(tarea)
                 .usuario(usuario)
@@ -80,24 +74,7 @@ public class EvidenciaService {
                 .collect(Collectors.toList());
     }
 
-    public Resource loadEvidenciaAsResource(Long idEvidencia) {
-        Evidencia evidencia = evidenciaCrudRepository.findById(idEvidencia)
-                .orElseThrow(() -> new ResourceNotFoundException("Evidencia no encontrada"));
-
-        try {
-            Path filePath = Paths.get(evidencia.getRutaArchivo()).normalize();
-            Resource resource = new UrlResource(filePath.toUri());
-
-            if (resource.exists()) {
-                return resource;
-            } else {
-                throw new ResourceNotFoundException("Archivo no encontrado: " + evidencia.getNombreArchivo());
-            }
-        } catch (MalformedURLException ex) {
-            throw new ResourceNotFoundException("Archivo no encontrado: " + evidencia.getNombreArchivo());
-        }
-    }
-
+    // Ya no se usa Resource local, el frontend usará directamente la URL guardada en rutaArchivo
     public Evidencia getEvidenciaEntity(Long idEvidencia) {
         return evidenciaCrudRepository.findById(idEvidencia)
                 .orElseThrow(() -> new ResourceNotFoundException("Evidencia no encontrada"));

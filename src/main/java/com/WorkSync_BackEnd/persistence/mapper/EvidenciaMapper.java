@@ -13,11 +13,8 @@ public class EvidenciaMapper {
             return null;
         }
 
-        // Construir la URL de descarga basada en el ID
-        String urlDescarga = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/api/evidencias/descargar/")
-                .path(evidencia.getIdEvidencia().toString())
-                .toUriString();
+        // Usar la URL directa guardada (Cloudinary u otro storage externo)
+        String urlDescarga = evidencia.getRutaArchivo();
 
         return EvidenciaDTO.builder()
                 .idEvidencia(evidencia.getIdEvidencia())
