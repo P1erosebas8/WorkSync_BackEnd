@@ -47,13 +47,13 @@ public class EmailService {
         map.add("grant_type", "refresh_token");
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
-        
+
         ResponseEntity<Map> response = restTemplate.postForEntity(tokenUrl, request, Map.class);
-        
+
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             return (String) response.getBody().get("access_token");
         }
-        
+
         throw new RuntimeException("Error al obtener el Access Token de Google");
     }
 
@@ -62,11 +62,10 @@ public class EmailService {
             String accessToken = getAccessToken();
             String gmailUrl = "https://gmail.googleapis.com/gmail/v1/users/me/messages/send";
 
-            // Construir el formato MIME de forma manual para evitar dependencias de JavaMail
             String emailContent = "To: " + to + "\r\n" +
-                                  "Subject: " + subject + "\r\n" +
-                                  "Content-Type: text/html; charset=utf-8\r\n\r\n" +
-                                  bodyHtml;
+                    "Subject: " + subject + "\r\n" +
+                    "Content-Type: text/html; charset=utf-8\r\n\r\n" +
+                    bodyHtml;
 
             String encodedEmail = Base64.getUrlEncoder().encodeToString(emailContent.getBytes(StandardCharsets.UTF_8));
 
@@ -78,7 +77,7 @@ public class EmailService {
             requestBody.put("raw", encodedEmail);
 
             HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
-            
+
             ResponseEntity<String> response = restTemplate.postForEntity(gmailUrl, request, String.class);
 
             if (!response.getStatusCode().is2xxSuccessful()) {

@@ -193,11 +193,11 @@ public class AuthController {
     @PostMapping("/google")
     public ResponseEntity<AuthResponse> googleLogin(@Valid @RequestBody GoogleAuthRequest request) {
         String url = "https://oauth2.googleapis.com/tokeninfo?id_token=" + request.getToken();
-        
+
         try {
             @SuppressWarnings("unchecked")
             Map<String, Object> payload = restTemplate.getForObject(url, Map.class);
-            
+
             if (payload == null || !payload.containsKey("email")) {
                 throw new RuntimeException("Token de Google inválido");
             }
@@ -211,7 +211,6 @@ public class AuthController {
             Usuario usuario = usuarioCrudRepository.findByCorreoElectronico(email).orElse(null);
 
             if (usuario == null) {
-                // Crear usuario si no existe
                 Rol rol = rolCrudRepository.findByNombre(RolNombre.COLABORADOR)
                         .orElseGet(() -> rolCrudRepository.save(Rol.builder()
                                 .nombre(RolNombre.COLABORADOR)
@@ -221,11 +220,11 @@ public class AuthController {
                 usuario = Usuario.builder()
                         .nombre(nombre)
                         .correoElectronico(email)
-                        .contrasena(passwordEncoder.encode(UUID.randomUUID().toString())) // Contraseña aleatoria
-                        .estado(true) // Activo porque viene de Google
+                        .contrasena(passwordEncoder.encode(UUID.randomUUID().toString()))
+                        .estado(true)
                         .rol(rol)
                         .build();
-                
+
                 usuario = usuarioCrudRepository.save(usuario);
             }
 
@@ -233,9 +232,10 @@ public class AuthController {
             final String jwt = jwtUtil.generateToken(userDetails, usuario);
 
             return ResponseEntity.ok(new AuthResponse(jwt));
-            
+
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new AuthResponse("Error al validar el token de Google: " + e.getMessage()));
+            return ResponseEntity.badRequest()
+                    .body(new AuthResponse("Error al validar el token de Google: " + e.getMessage()));
         }
     }
 }

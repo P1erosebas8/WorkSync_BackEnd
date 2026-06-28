@@ -25,7 +25,7 @@ public class Evidencia {
     private String tipoMime;
 
     @Column(nullable = false)
-    private String rutaArchivo; // Ruta local donde se guarda el archivo
+    private String rutaArchivo;
 
     private LocalDateTime fechaSubida;
 

@@ -13,7 +13,6 @@ public class EvidenciaMapper {
             return null;
         }
 
-        // Usar la URL directa guardada (Cloudinary u otro storage externo)
         String urlDescarga = evidencia.getRutaArchivo();
 
         return EvidenciaDTO.builder()

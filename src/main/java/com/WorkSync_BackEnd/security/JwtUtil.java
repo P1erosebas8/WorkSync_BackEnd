@@ -16,7 +16,6 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    // Clave secreta (debe tener al menos 256 bits/32 caracteres)
     private static final String SECRET = "EstaEsUnaClaveSecretaMuyLargaYSeguraParaWorkSync2024";
     private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
 
