@@ -46,6 +46,11 @@ public class TaskService {
         task.setStatus(EstadoTarea.PENDIENTE);
         task.setProgressPercentage(0);
         Task saved = taskRepository.save(task);
+        
+        if (saved.getAssigneeId() != null) {
+            taskNotificationService.notifyReassignment(saved);
+        }
+        
         return toDto(saved);
     }
 
