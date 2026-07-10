@@ -26,11 +26,11 @@ public class AssignmentService {
     private ProjectRepository projectRepository;
 
     public Assignment assignUserToProject(AsignacionRequestDTO dto) {
-        User user = userRepository.getById(dto.getIdUsuario())
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + dto.getIdUsuario()));
+        User user = userRepository.getById(dto.getUserId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + dto.getUserId()));
 
-        Project project = projectRepository.getById(dto.getIdProyecto())
-                .orElseThrow(() -> new RuntimeException("Proyecto no encontrado con ID: " + dto.getIdProyecto()));
+        Project project = projectRepository.getById(dto.getProjectId())
+                .orElseThrow(() -> new RuntimeException("Proyecto no encontrado con ID: " + dto.getProjectId()));
 
         Assignment assignment = Assignment.builder()
                 .user(user)

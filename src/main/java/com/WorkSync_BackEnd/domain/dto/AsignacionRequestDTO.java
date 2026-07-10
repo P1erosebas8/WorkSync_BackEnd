@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class AsignacionRequestDTO {
-    private Long idUsuario;
-    private Long idProyecto;
+    private Long userId;
+    private Long projectId;
 }
