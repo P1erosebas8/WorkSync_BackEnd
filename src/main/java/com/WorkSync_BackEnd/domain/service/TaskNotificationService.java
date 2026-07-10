@@ -70,7 +70,7 @@ public class TaskNotificationService {
         if (task.getStatus() == EstadoTarea.BLOQUEADO || task.getStatus() == EstadoTarea.EN_REVISION) {
             if (task.getAssigneeId() != null) {
                 userRepository.getById(task.getAssigneeId()).ifPresent(u -> {
-                    String subject = "WorkSync - Atención requerida en tarea: " + task.getTitle();
+                    String subject = "WorkSync - Atencion requerida en tarea: " + task.getTitle();
                     String body = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #333; border-radius: 8px; overflow: hidden; background-color: #1a1a1a; color: #fff;\">"
                             +
                             "<div style=\"background-color: #f59e0b; padding: 20px; text-align: center;\">" +
