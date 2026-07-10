@@ -72,6 +72,14 @@ public class TaskService {
                 throw new IllegalStateException("No se puede mover la tarea porque depende de otra que no ha sido completada.");
             }
         }
+        
+        if (task.getStatus() == EstadoTarea.COMPLETADO && newStatus != EstadoTarea.COMPLETADO) {
+            org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+            boolean isAdmin = auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ADMIN"));
+            if (!isAdmin) {
+                throw new IllegalStateException("Solo un administrador puede devolver una tarea completada (Control de Calidad).");
+            }
+        }
                 
         task.setStatus(newStatus);
         Task saved = taskRepository.save(task);
