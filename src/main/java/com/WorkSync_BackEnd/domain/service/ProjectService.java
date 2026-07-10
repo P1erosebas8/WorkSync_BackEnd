@@ -21,6 +21,7 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final AssignmentRepository assignmentRepository;
     private final UserRepository userRepository;
+    private final com.WorkSync_BackEnd.domain.repository.TaskRepository taskRepository;
 
     public List<Project> getAll() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -97,5 +98,54 @@ public class ProjectService {
     @Transactional
     public void removeCollaborator(Long projectId, Long userId) {
         assignmentRepository.deleteByProjectAndUser(projectId, userId);
+    }
+
+    public com.WorkSync_BackEnd.domain.dto.ProjectMetricsDTO getMetrics(Long projectId) {
+        List<com.WorkSync_BackEnd.domain.model.Task> tasks = taskRepository.getByProject(projectId);
+        int total = tasks.size();
+        if (total == 0) {
+            return com.WorkSync_BackEnd.domain.dto.ProjectMetricsDTO.builder().build();
+        }
+
+        int completed = 0;
+        int pending = 0;
+        int inProgress = 0;
+        int overdue = 0;
+        int onTime = 0;
+
+        java.time.LocalDate today = java.time.LocalDate.now();
+
+        for (com.WorkSync_BackEnd.domain.model.Task task : tasks) {
+            switch (task.getStatus()) {
+                case COMPLETADO: completed++; break;
+                case PENDIENTE: pending++; break;
+                case EN_PROGRESO:
+                case EN_REVISION:
+                case BLOQUEADO:
+                    inProgress++; break;
+            }
+            
+            if (task.getDueDate() != null) {
+                if (task.getStatus() != com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea.COMPLETADO 
+                    && task.getDueDate().isBefore(today)) {
+                    overdue++;
+                } else if (task.getStatus() == com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea.COMPLETADO) {
+                    onTime++; // simplified logic for on time
+                }
+            }
+        }
+
+        double efficiency = ((double) completed / total) * 100.0;
+        efficiency = Math.round(efficiency * 100.0) / 100.0;
+
+        return com.WorkSync_BackEnd.domain.dto.ProjectMetricsDTO.builder()
+                .totalTasks(total)
+                .completedTasks(completed)
+                .pendingTasks(pending)
+                .inProgressTasks(inProgress)
+                .overdueTasks(overdue)
+                .onTimeTasks(onTime)
+                .efficiencyPercentage(efficiency)
+                .build();
     }
 }

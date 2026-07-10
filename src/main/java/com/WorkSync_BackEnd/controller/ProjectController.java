@@ -49,4 +49,9 @@ public class ProjectController {
     public void removeCollaborator(@PathVariable Long projectId, @PathVariable Long userId) {
         projectService.removeCollaborator(projectId, userId);
     }
+
+    @GetMapping("/{id}/metricas")
+    public com.WorkSync_BackEnd.domain.dto.ProjectMetricsDTO getMetrics(@PathVariable Long id) {
+        return projectService.getMetrics(id);
+    }
 }

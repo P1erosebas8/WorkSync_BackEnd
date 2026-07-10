@@ -15,6 +15,31 @@ import java.util.stream.Collectors;
 public class TaskService {
 
     private final TaskRepository taskRepository;
+    private final com.WorkSync_BackEnd.domain.repository.TaskHistoryRepository taskHistoryRepository;
+    private final com.WorkSync_BackEnd.domain.repository.UserRepository userRepository;
+
+    private Long getCurrentUserId() {
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof org.springframework.security.core.userdetails.UserDetails) {
+            String username = ((org.springframework.security.core.userdetails.UserDetails) auth.getPrincipal()).getUsername();
+            return userRepository.getByEmail(username)
+                    .map(com.WorkSync_BackEnd.domain.model.User::getUserId).orElse(null);
+        }
+        return null;
+    }
+
+    private void recordHistory(Long taskId, String oldStatus, String newStatus, String detail) {
+        Long currentUserId = getCurrentUserId();
+        com.WorkSync_BackEnd.domain.model.TaskHistory history = com.WorkSync_BackEnd.domain.model.TaskHistory.builder()
+                .taskId(taskId)
+                .oldStatus(oldStatus)
+                .newStatus(newStatus)
+                .changeDetail(detail)
+                .changeDate(java.time.LocalDateTime.now())
+                .userId(currentUserId)
+                .build();
+        taskHistoryRepository.save(history);
+    }
 
     public TaskResponseDTO create(Task task) {
         task.setStatus(EstadoTarea.PENDIENTE);
@@ -39,6 +64,9 @@ public class TaskService {
         Task task = taskRepository.getById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada"));
                 
+        String oldStatus = task.getStatus().name();
+        String oldAssignee = String.valueOf(task.getAssigneeId());
+        
         task.setTitle(taskDetails.getTitle());
         task.setDescription(taskDetails.getDescription());
         task.setStatus(taskDetails.getStatus());
@@ -51,6 +79,14 @@ public class TaskService {
         }
 
         Task saved = taskRepository.save(task);
+        
+        if (!oldStatus.equals(saved.getStatus().name())) {
+            recordHistory(saved.getTaskId(), oldStatus, saved.getStatus().name(), "Cambio de estado en edición");
+        }
+        if (!String.valueOf(saved.getAssigneeId()).equals(oldAssignee)) {
+            recordHistory(saved.getTaskId(), oldStatus, saved.getStatus().name(), "Reasignación de tarea");
+        }
+        
         return toDto(saved);
     }
 
@@ -81,8 +117,12 @@ public class TaskService {
             }
         }
                 
+        String oldStatus = task.getStatus().name();
         task.setStatus(newStatus);
         Task saved = taskRepository.save(task);
+        
+        recordHistory(saved.getTaskId(), oldStatus, newStatus.name(), "Movimiento en Kanban");
+        
         return toDto(saved);
     }
 
@@ -100,5 +140,26 @@ public class TaskService {
                 .assigneeName(task.getAssigneeName())
                 .dependsOnTaskId(task.getDependsOnTaskId())
                 .build();
+    }
+
+    public List<com.WorkSync_BackEnd.domain.dto.TaskHistoryDTO> getHistory(Long taskId) {
+        return taskHistoryRepository.getByTaskId(taskId).stream().map(h -> {
+            String userName = "Sistema";
+            if (h.getUserId() != null) {
+                userName = userRepository.getById(h.getUserId())
+                        .map(com.WorkSync_BackEnd.domain.model.User::getName)
+                        .orElse("Usuario Desconocido");
+            }
+            return com.WorkSync_BackEnd.domain.dto.TaskHistoryDTO.builder()
+                    .historyId(h.getHistoryId())
+                    .taskId(h.getTaskId())
+                    .oldStatus(h.getOldStatus())
+                    .newStatus(h.getNewStatus())
+                    .changeDetail(h.getChangeDetail())
+                    .changeDate(h.getChangeDate())
+                    .userId(h.getUserId())
+                    .userName(userName)
+                    .build();
+        }).collect(Collectors.toList());
     }
 }
