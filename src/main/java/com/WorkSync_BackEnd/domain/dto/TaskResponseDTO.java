@@ -19,4 +19,5 @@ public class TaskResponseDTO {
     private Long projectId;
     private Long assigneeId;
     private String assigneeName;
+    private Long dependsOnTaskId;
 }

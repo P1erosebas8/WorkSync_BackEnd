@@ -23,4 +23,5 @@ public class Task {
     private Long projectId;
     private Long assigneeId;
     private String assigneeName;
+    private Long dependsOnTaskId;
 }

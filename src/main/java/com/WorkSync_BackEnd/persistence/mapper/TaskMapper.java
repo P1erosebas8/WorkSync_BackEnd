@@ -21,6 +21,7 @@ public interface TaskMapper {
     @Mapping(source = "proyecto.idProyecto", target = "projectId")
     @Mapping(source = "responsable.idUsuario", target = "assigneeId")
     @Mapping(source = "responsable.nombre", target = "assigneeName")
+    @Mapping(source = "dependeDe.idTarea", target = "dependsOnTaskId")
     Task toTask(Tarea tarea);
 
     List<Task> toTasks(List<Tarea> tareas);
@@ -28,5 +29,6 @@ public interface TaskMapper {
     @InheritInverseConfiguration
     @Mapping(target = "proyecto", ignore = true)
     @Mapping(target = "responsable", ignore = true)
+    @Mapping(target = "dependeDe", ignore = true)
     Tarea toTareaEntity(Task taskDomain);
 }

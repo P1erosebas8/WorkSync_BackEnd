@@ -30,4 +30,7 @@ private Proyecto proyecto;
 @ManyToOne
 @JoinColumn(name = "id_usuario")
 private Usuario responsable;
+@ManyToOne(fetch = FetchType.LAZY)
+@JoinColumn(name = "id_tarea_dependencia")
+private Tarea dependeDe;
 }

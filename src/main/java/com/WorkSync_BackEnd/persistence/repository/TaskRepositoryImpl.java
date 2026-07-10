@@ -51,6 +51,12 @@ public class TaskRepositoryImpl implements TaskRepository {
             tareaEntity.setResponsable(responsable);
         }
         
+        if (taskDomain.getDependsOnTaskId() != null) {
+            Tarea dependeDe = new Tarea();
+            dependeDe.setIdTarea(taskDomain.getDependsOnTaskId());
+            tareaEntity.setDependeDe(dependeDe);
+        }
+        
         return taskMapper.toTask(tareaCrudRepository.save(tareaEntity));
     }
 

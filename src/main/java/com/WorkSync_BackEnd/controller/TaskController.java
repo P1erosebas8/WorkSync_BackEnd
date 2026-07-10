@@ -44,9 +44,15 @@ public class TaskController {
     }
 
     @PatchMapping("/{id}/estado")
-    public ResponseEntity<TaskResponseDTO> updateStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
-        com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea newStatus = 
-            com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea.valueOf(body.get("status"));
-        return ResponseEntity.ok(taskService.updateStatus(id, newStatus));
+    public ResponseEntity<?> updateStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
+        try {
+            com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea newStatus = 
+                com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea.valueOf(body.get("status"));
+            return ResponseEntity.ok(taskService.updateStatus(id, newStatus));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error interno del servidor");
+        }
     }
 }

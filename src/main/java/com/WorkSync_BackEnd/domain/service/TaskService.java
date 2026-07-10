@@ -64,6 +64,15 @@ public class TaskService {
     public TaskResponseDTO updateStatus(Long id, EstadoTarea newStatus) {
         Task task = taskRepository.getById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada"));
+                
+        if (task.getDependsOnTaskId() != null && newStatus != EstadoTarea.PENDIENTE) {
+            Task parentTask = taskRepository.getById(task.getDependsOnTaskId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Dependencia no encontrada"));
+            if (parentTask.getStatus() != EstadoTarea.COMPLETADO) {
+                throw new IllegalStateException("No se puede mover la tarea porque depende de otra que no ha sido completada.");
+            }
+        }
+                
         task.setStatus(newStatus);
         Task saved = taskRepository.save(task);
         return toDto(saved);
@@ -81,6 +90,7 @@ public class TaskService {
                 .projectId(task.getProjectId())
                 .assigneeId(task.getAssigneeId())
                 .assigneeName(task.getAssigneeName())
+                .dependsOnTaskId(task.getDependsOnTaskId())
                 .build();
     }
 }
