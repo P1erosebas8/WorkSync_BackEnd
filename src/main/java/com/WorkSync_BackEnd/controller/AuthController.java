@@ -105,7 +105,6 @@ public class AuthController {
 
         emailService.sendEmail(usuario.getCorreoElectronico(), subject, body);
 
-        // Devolvemos un 200 con un mensaje de éxito
         return ResponseEntity.ok(new AuthResponse("Usuario registrado. Verifica tu correo electrónico."));
     }
 
