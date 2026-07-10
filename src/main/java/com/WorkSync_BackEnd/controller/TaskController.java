@@ -42,4 +42,11 @@ public class TaskController {
         taskService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/estado")
+    public ResponseEntity<TaskResponseDTO> updateStatus(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
+        com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea newStatus = 
+            com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea.valueOf(body.get("status"));
+        return ResponseEntity.ok(taskService.updateStatus(id, newStatus));
+    }
 }

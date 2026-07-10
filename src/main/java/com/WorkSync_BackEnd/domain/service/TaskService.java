@@ -61,6 +61,14 @@ public class TaskService {
         taskRepository.delete(id);
     }
 
+    public TaskResponseDTO updateStatus(Long id, EstadoTarea newStatus) {
+        Task task = taskRepository.getById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarea no encontrada"));
+        task.setStatus(newStatus);
+        Task saved = taskRepository.save(task);
+        return toDto(saved);
+    }
+
     private TaskResponseDTO toDto(Task task) {
         return TaskResponseDTO.builder()
                 .taskId(task.getTaskId())
