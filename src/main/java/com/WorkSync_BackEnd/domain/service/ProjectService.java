@@ -112,6 +112,7 @@ public class ProjectService {
         int inProgress = 0;
         int overdue = 0;
         int onTime = 0;
+        int blocked = 0;
 
         java.time.LocalDate today = java.time.LocalDate.now();
 
