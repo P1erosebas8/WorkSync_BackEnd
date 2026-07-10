@@ -121,8 +121,9 @@ public class ProjectService {
                 case PENDIENTE: pending++; break;
                 case EN_PROGRESO:
                 case EN_REVISION:
-                case BLOQUEADO:
                     inProgress++; break;
+                case BLOQUEADO:
+                    blocked++; break;
             }
             
             if (task.getDueDate() != null) {
@@ -143,6 +144,7 @@ public class ProjectService {
                 .completedTasks(completed)
                 .pendingTasks(pending)
                 .inProgressTasks(inProgress)
+                .blockedTasks(blocked)
                 .overdueTasks(overdue)
                 .onTimeTasks(onTime)
                 .efficiencyPercentage(efficiency)

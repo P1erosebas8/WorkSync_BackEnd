@@ -7,6 +7,7 @@ public class ProjectMetricsDTO {
     private int completedTasks;
     private int pendingTasks;
     private int inProgressTasks;
+    private int blockedTasks;
     private int overdueTasks;
     private int onTimeTasks;
     private double efficiencyPercentage;
