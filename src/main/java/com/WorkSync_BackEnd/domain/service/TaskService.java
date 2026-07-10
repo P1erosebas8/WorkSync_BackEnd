@@ -17,6 +17,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final com.WorkSync_BackEnd.domain.repository.TaskHistoryRepository taskHistoryRepository;
     private final com.WorkSync_BackEnd.domain.repository.UserRepository userRepository;
+    private final TaskNotificationService taskNotificationService;
 
     private Long getCurrentUserId() {
         org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
@@ -82,9 +83,11 @@ public class TaskService {
         
         if (!oldStatus.equals(saved.getStatus().name())) {
             recordHistory(saved.getTaskId(), oldStatus, saved.getStatus().name(), "Cambio de estado en edición");
+            taskNotificationService.notifyStatusChange(saved, oldStatus);
         }
         if (!String.valueOf(saved.getAssigneeId()).equals(oldAssignee)) {
             recordHistory(saved.getTaskId(), oldStatus, saved.getStatus().name(), "Reasignación de tarea");
+            taskNotificationService.notifyReassignment(saved);
         }
         
         return toDto(saved);
@@ -122,6 +125,7 @@ public class TaskService {
         Task saved = taskRepository.save(task);
         
         recordHistory(saved.getTaskId(), oldStatus, newStatus.name(), "Movimiento en Kanban");
+        taskNotificationService.notifyStatusChange(saved, oldStatus);
         
         return toDto(saved);
     }

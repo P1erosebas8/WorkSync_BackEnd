@@ -54,4 +54,10 @@ public class ProjectController {
     public com.WorkSync_BackEnd.domain.dto.ProjectMetricsDTO getMetrics(@PathVariable Long id) {
         return projectService.getMetrics(id);
     }
+
+    @GetMapping("/metricas/globales")
+    @PreAuthorize("hasRole('ADMIN')")
+    public com.WorkSync_BackEnd.domain.dto.GlobalMetricsDTO getGlobalMetrics() {
+        return projectService.getGlobalMetrics();
+    }
 }

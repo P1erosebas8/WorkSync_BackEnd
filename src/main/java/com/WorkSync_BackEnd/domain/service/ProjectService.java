@@ -148,4 +148,46 @@ public class ProjectService {
                 .efficiencyPercentage(efficiency)
                 .build();
     }
+
+    public com.WorkSync_BackEnd.domain.dto.GlobalMetricsDTO getGlobalMetrics() {
+        List<Project> projects = projectRepository.getAll();
+        int totalProjects = projects.size();
+        int activeProjects = 0;
+        int archivedProjects = 0;
+        
+        int totalTasks = 0;
+        int completedTasks = 0;
+        int pendingTasks = 0;
+
+        for (Project p : projects) {
+            if (p.getStatus() == EstadoProyecto.ARCHIVADO) {
+                archivedProjects++;
+            } else {
+                activeProjects++;
+            }
+            
+            List<com.WorkSync_BackEnd.domain.model.Task> tasks = taskRepository.getByProject(p.getProjectId());
+            for (com.WorkSync_BackEnd.domain.model.Task t : tasks) {
+                totalTasks++;
+                if (t.getStatus() == com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea.COMPLETADO) {
+                    completedTasks++;
+                } else if (t.getStatus() == com.WorkSync_BackEnd.persistence.entity.enums.EstadoTarea.PENDIENTE) {
+                    pendingTasks++;
+                }
+            }
+        }
+
+        double globalEfficiency = totalTasks > 0 ? ((double) completedTasks / totalTasks) * 100.0 : 0.0;
+        globalEfficiency = Math.round(globalEfficiency * 100.0) / 100.0;
+
+        return com.WorkSync_BackEnd.domain.dto.GlobalMetricsDTO.builder()
+                .totalProjects(totalProjects)
+                .activeProjects(activeProjects)
+                .archivedProjects(archivedProjects)
+                .totalTasks(totalTasks)
+                .completedTasks(completedTasks)
+                .pendingTasks(pendingTasks)
+                .globalEfficiency(globalEfficiency)
+                .build();
+    }
 }
