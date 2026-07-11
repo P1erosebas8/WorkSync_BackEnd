@@ -88,14 +88,17 @@ public class AuthService {
         usuarioCrudRepository.save(usuario);
 
         String subject = "WorkSync - Verifica tu cuenta";
-        String body = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #333; border-radius: 8px; overflow: hidden; background-color: #1a1a1a; color: #fff;\">" +
+        String body = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #333; border-radius: 8px; overflow: hidden; background-color: #1a1a1a; color: #fff;\">"
+                +
                 "<div style=\"background-color: #f59e0b; padding: 20px; text-align: center;\">" +
                 "<h2 style=\"color: #000; margin: 0; font-size: 24px;\">WorkSync</h2>" +
                 "</div>" +
                 "<div style=\"padding: 30px;\">" +
                 "<h3 style=\"color: #f59e0b; margin-top: 0;\">Bienvenido, " + request.getNombre() + "</h3>" +
-                "<p style=\"color: #ccc; line-height: 1.6;\">Para activar tu cuenta, ingresa el siguiente código de verificación:</p>" +
-                "<div style=\"background-color: #242424; border: 1px dashed #f59e0b; padding: 15px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #f59e0b; margin: 20px 0; border-radius: 8px;\">" + otp + "</div>" +
+                "<p style=\"color: #ccc; line-height: 1.6;\">Para activar tu cuenta, ingresa el siguiente código de verificación:</p>"
+                +
+                "<div style=\"background-color: #242424; border: 1px dashed #f59e0b; padding: 15px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #f59e0b; margin: 20px 0; border-radius: 8px;\">"
+                + otp + "</div>" +
                 "<p style=\"color: #888; font-size: 12px; margin-bottom: 0;\">Este código expirará en 15 minutos.</p>" +
                 "</div>" +
                 "</div>";
@@ -131,15 +134,18 @@ public class AuthService {
         usuario.setOtpExpiration(LocalDateTime.now().plusMinutes(15));
         usuarioCrudRepository.save(usuario);
 
-        String subject = "WorkSync - Recuperación de Contraseña";
-        String body = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #333; border-radius: 8px; overflow: hidden; background-color: #1a1a1a; color: #fff;\">" +
+        String subject = "WorkSync - Recuperacion de Contrasena";
+        String body = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #333; border-radius: 8px; overflow: hidden; background-color: #1a1a1a; color: #fff;\">"
+                +
                 "<div style=\"background-color: #dc2626; padding: 20px; text-align: center;\">" +
                 "<h2 style=\"color: #fff; margin: 0; font-size: 24px;\">WorkSync</h2>" +
                 "</div>" +
                 "<div style=\"padding: 30px;\">" +
                 "<h3 style=\"color: #ef4444; margin-top: 0;\">Recuperación de Contraseña</h3>" +
-                "<p style=\"color: #ccc; line-height: 1.6;\">Has solicitado restablecer tu contraseña. Tu código de verificación es:</p>" +
-                "<div style=\"background-color: #242424; border: 1px dashed #ef4444; padding: 15px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #ef4444; margin: 20px 0; border-radius: 8px;\">" + otp + "</div>" +
+                "<p style=\"color: #ccc; line-height: 1.6;\">Has solicitado restablecer tu contraseña. Tu código de verificación es:</p>"
+                +
+                "<div style=\"background-color: #242424; border: 1px dashed #ef4444; padding: 15px; text-align: center; font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #ef4444; margin: 20px 0; border-radius: 8px;\">"
+                + otp + "</div>" +
                 "<p style=\"color: #888; font-size: 12px; margin-bottom: 0;\">Este código expirará en 15 minutos.</p>" +
                 "</div>" +
                 "</div>";
