@@ -55,6 +55,9 @@ public class ProjectService {
                 
         project.setAdministrator(admin);
         project.setStatus(EstadoProyecto.ACTIVO);
+        if (project.getStartDate() == null) {
+            project.setStartDate(LocalDate.now());
+        }
         return projectRepository.save(project);
     }
 
